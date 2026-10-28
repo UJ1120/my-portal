@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PERSONAL PORTAL — 個人品牌入口</title>
+  <meta name="description" content="一個簡潔、專業且容易客製化的個人品牌入口網站學生範本。">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --bg-primary: #050505;
+      --bg-secondary: #0A0A0A;
+      --bg-card: rgba(17, 17, 17, 0.75);
+      --text-primary: #FFFFFF;
+      --text-secondary: #E5E5E5;
+      --text-muted: #A3A3A3;
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.20);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* 只有當 JavaScript 100% 成功啟動貓咪鼠標時，才隱藏原生鼠標，確保絕不卡死！ */
+    body.has-custom-cursor, 
+    body.has-custom-cursor a, 
+    body.has-custom-cursor button, 
+    body.has-custom-cursor input, 
+    body.has-custom-cursor textarea, 
+    body.has-custom-cursor [onclick] {
+      cursor: none !important;
+    }
+
+    /* ================= 🐱 可愛貓咪動態鼠標 CSS ================= */
+    .cat-cursor-head {
+      width: 36px;
+      height: 36px;
+      position: fixed;
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease-out, opacity 0.3s ease;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+      opacity: 0;
+    }
+
+    .cat-cursor-ring {
+      width: 46px;
+      height: 46px;
+      position: fixed;
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      border: 1.5px dashed rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      transition: width 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+                  height 0.25s cubic-bezier(0.25, 1, 0.5, 1), 
+                  border-color 0.25s ease,
+                  background-color 0.25s ease,
+                  opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    body.has-custom-cursor .cat-cursor-head,
+    body.has-custom-cursor .cat-cursor-ring {
+      opacity: 1;
+    }
+
+    body.cursor-hover .cat-cursor-head {
+      transform: translate(-50%, -50%) scale(1.35);
+    }
+    body.cursor-hover .cat-eye-normal { display: none; }
+    body.cursor-hover .cat-eye-happy { display: block !important; }
+
+    body.cursor-hover .cat-cursor-ring {
+      width: 60px;
+      height: 60px;
+      border-color: rgba(255, 215, 0, 0.85);
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(2px);
+    }
+
+    body.cursor-active .cat-cursor-head {
+      transform: translate(-50%, -50%) scale(0.85) rotate(-10deg);
+    }
+
+    .cat-paw-trail {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9997;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      transform: translate(-50%, -50%);
+      animation: fadePaw 0.8s forwards ease-out;
+    }
+
+    @keyframes fadePaw {
+      0% { opacity: 0.9; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(20deg); }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .card-border {
+      border: 1px solid var(--border-subtle);
+    }
+
+    .card-border-strong {
+      border: 1px solid var(--border-strong);
+    }
+
+    .tab-btn.active {
+      background-color: var(--border-strong);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.30);
+    }
+
+    #toast {
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-white selection:text-black relative overflow-x-hidden">
+
+  <!-- ================= 🐱 動態貓咪鼠標 HTML ================= -->
+  <div id="cat-head" class="cat-cursor-head">
+    <svg viewBox="0 0 100 100" class="w-full h-full">
+      <polygon points="18,38 32,8 48,30" fill="#FFFFFF" />
+      <polygon points="82,38 68,8 52,30" fill="#FFFFFF" />
+      <polygon points="24,34 33,16 43,30" fill="#FFB6C1" />
+      <polygon points="76,34 67,16 57,30" fill="#FFB6C1" />
+      <ellipse cx="50" cy="55" rx="38" ry="32" fill="#FFFFFF" />
+      
+      <g class="cat-eye-normal">
+        <circle cx="36" cy="50" r="5" fill="#111111" />
+        <circle cx="38" cy="48" r="2" fill="#FFFFFF" />
+        <circle cx="64" cy="50" r="5" fill="#111111" />
+        <circle cx="66" cy="48" r="2" fill="#FFFFFF" />
+      </g>
+      
+      <g class="cat-eye-happy" style="display: none;">
+        <path d="M 30 52 Q 36 44 42 52" stroke="#111111" stroke-width="3" fill="none" stroke-linecap="round" />
+        <path d="M 58 52 Q 64 44 70 52" stroke="#111111" stroke-width="3" fill="none" stroke-linecap="round" />
+      </g>
+      
+      <polygon points="47,57 53,57 50,61" fill="#FFB6C1" />
+      <path d="M 44 64 Q 50 69 50 62 Q 50 69 56 64" stroke="#444444" stroke-width="2.5" fill="none" stroke-linecap="round" />
+      <ellipse cx="28" cy="60" rx="5" ry="3" fill="#FFB6C1" opacity="0.6" />
+      <ellipse cx="72" cy="60" rx="5" ry="3" fill="#FFB6C1" opacity="0.6" />
+      <line x1="12" y1="52" x2="26" y2="55" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" />
+      <line x1="10" y1="60" x2="26" y2="60" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" />
+      <line x1="88" y1="52" x2="74" y2="55" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" />
+      <line x1="90" y1="60" x2="74" y2="60" stroke="#E5E5E5" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </div>
+  <div id="cat-ring" class="cat-cursor-ring"></div>
+
+  <!-- ================= Background Dynamic Video Layer (Bright Purple Sunset) ================= -->
+  <div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden">
+    <div class="relative w-full h-full">
+      <video id="bg-video" autoplay loop muted playsinline class="w-full h-full object-cover opacity-85 brightness-110">
+        <source src="bg.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-black/15"></div>
+      <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#050505]/60 to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#050505]/60 to-transparent"></div>
+      <div class="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#050505]/60 to-transparent"></div>
+      <div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#050505]/60 to-transparent"></div>
+    </div>
+  </div>
+
+  <!-- ================= Header Area ================= -->
+  <header class="w-full border-b card-border backdrop-blur-md sticky top-0 z-40 bg-[rgba(5,5,5,0.75)]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <img id="header-logo" src="avatar.jpg" alt="Logo" class="w-8 h-8 rounded-full object-cover card-border shadow-sm" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23222\'/><text x=\'50\' y=\'55\' font-size=\'30\' fill=\'%23fff\' text-anchor=\'middle\'>🐱</text></svg>'">
+        <span id="header-brand" class="font-medium text-sm sm:text-base tracking-tight text-white">Neil Lin Studio</span>
+      </div>
+      <div class="text-xs tracking-widest text-zinc-400 font-mono uppercase hidden sm:block">
+        PERSONAL PORTAL / 2026
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= Main Content Area ================= -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Sidebar Profile Panel -->
+      <aside class="lg:col-span-4 bg-[#111111]/80 backdrop-blur-md card-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden card-border-strong shadow-lg mb-5 bg-[#1a1a1a]">
+          <img id="profile-image" src="avatar.jpg" alt="Profile" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23222\'/><text x=\'50\' y=\'55\' font-size=\'30\' fill=\'%23fff\' text-anchor=\'middle\'>🐱</text></svg>'">
+        </div>
+
+        <div class="flex flex-col items-start text-left space-y-1">
+          <h1 id="profile-name" class="text-2xl font-semibold tracking-tight text-white">Neil Lin</h1>
+          <p id="profile-chinese-name" class="text-sm text-[#A3A3A3]">林祐頡</p>
+          <p id="profile-brand" class="text-xs font-medium text-zinc-300 mt-2 px-3 py-1 rounded-full bg-zinc-800/80 card-border inline-block">
+            Neil Lin Studio
+          </p>
+        </div>
+
+        <hr class="border-t card-border">
+
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center text-[#E5E5E5] space-x-3">
+            <i class="fa-solid fa-location-dot w-4 text-[#A3A3A3] text-center"></i>
+            <span id="profile-location">台中市，台灣</span>
+          </div>
+          <div id="profile-email-container" class="flex items-center text-[#E5E5E5] space-x-3 truncate">
+            <i class="fa-solid fa-envelope w-4 text-[#A3A3A3] text-center"></i>
+            <span id="profile-email-label" class="text-zinc-300">信箱</span>
+            <a id="profile-email" href="" class="hover:underline truncate text-zinc-300 hidden"></a>
+          </div>
+        </div>
+
+        <hr class="border-t card-border">
+
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-[#A3A3A3] mb-2">關於簡介</h3>
+          <p id="profile-bio" class="text-sm text-[#E5E5E5] leading-relaxed">
+            你好！我是 Neil Lin（林祐頡），來自台灣台中。專注於數位體驗設計、視覺傳達與個人品牌打造，致力於將簡約美學與實用功能完美融合。
+          </p>
+        </div>
+
+        <hr class="border-t card-border">
+
+        <div class="pt-1">
+          <blockquote id="profile-quote" class="text-xs italic text-[#A3A3A3] leading-relaxed border-l-2 border-zinc-500 pl-3">
+            <span id="quote-text">「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」</span>
+            <footer id="profile-quote-author" class="text-[11px] not-italic text-zinc-400 mt-1">— 尼采 (Nietzsche)</footer>
+          </blockquote>
+        </div>
+      </aside>
+
+      <!-- Right Main Panel -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-2 bg-[#111111]/80 backdrop-blur-md p-1.5 rounded-xl card-border shadow-xl">
+          <button onclick="switchTab('social')" id="tab-social" class="tab-btn active flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition text-center card-border border-transparent">
+            社群連結
+          </button>
+          <button onclick="switchTab('guestbook')" id="tab-guestbook" class="tab-btn flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-[#A3A3A3] hover:text-white transition text-center card-border border-transparent">
+            留言板
+          </button>
+          <button onclick="switchTab('about')" id="tab-about" class="tab-btn flex-1 py-2.5 px-4 rounded-lg text-sm font-medium text-[#A3A3A3] hover:text-white transition text-center card-border border-transparent">
+            關於我
+          </button>
+        </div>
+
+        <!-- TAB 1: SOCIAL LINK CARDS (直接寫死於 HTML 確保 100% 永不消失) -->
+        <div id="view-social" class="tab-content space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="social-cards-container">
+            
+            <!-- 個人網站 -->
+            <div onclick="window.open(STUDENT_CONFIG.website, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-cyan-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background: linear-gradient(135deg, #00C6FF, #0072FF); color: #FFFFFF;">
+                  <i class="fa-solid fa-globe"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">個人網站</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">探索更多個人作品與專案。</p>
+              </div>
+            </div>
+
+            <!-- Instagram -->
+            <div onclick="window.open(STUDENT_CONFIG.instagram, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-pink-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #FFFFFF;">
+                  <i class="fa-brands fa-instagram"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">Instagram</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">分享生活與創作 (@suguru_uj)</p>
+              </div>
+            </div>
+
+            <!-- Facebook -->
+            <div onclick="window.open(STUDENT_CONFIG.facebook, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-blue-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background-color: #1877F2; color: #FFFFFF;">
+                  <i class="fa-brands fa-facebook"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">Facebook</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">文章近況與社群分享 (林祐頡)</p>
+              </div>
+            </div>
+
+            <!-- Threads -->
+            <div onclick="window.open(STUDENT_CONFIG.threads, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-zinc-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background-color: #000000; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.2);">
+                  <i class="fa-brands fa-threads"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">Threads</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">日常想法與互動 (@suguru_uj)</p>
+              </div>
+            </div>
+
+            <!-- FaceTime Audio -->
+            <div onclick="window.location.href=STUDENT_CONFIG.facetime" class="bg-[#111111]/80 backdrop-blur-md card-border border-emerald-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background-color: #34C759; color: #FFFFFF;">
+                  <i class="fa-solid fa-phone"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">FaceTime Audio</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">透過 Apple 裝置進行語音聯絡。</p>
+              </div>
+            </div>
+
+            <!-- LINE -->
+            <div onclick="openLineModal()" class="bg-[#111111]/80 backdrop-blur-md card-border border-green-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background-color: #06C755; color: #FFFFFF;">
+                  <i class="fa-brands fa-line"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">LINE</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">透過 LINE 聯絡與加好友。</p>
+              </div>
+            </div>
+
+            <!-- WhatsApp -->
+            <div onclick="window.open(STUDENT_CONFIG.whatsapp, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-emerald-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background-color: #25D366; color: #FFFFFF;">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">WhatsApp</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">透過 WhatsApp 即時訊息聯絡。</p>
+              </div>
+            </div>
+
+            <!-- Messenger -->
+            <div onclick="window.open(STUDENT_CONFIG.messenger, '_blank')" class="bg-[#111111]/80 backdrop-blur-md card-border border-indigo-500/30 p-5 rounded-2xl cursor-pointer hover:border-zinc-300 transition duration-200 flex flex-col justify-between space-y-4 shadow-lg">
+              <div class="flex items-start justify-between">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md" style="background: linear-gradient(135deg, #00B2FF, #006AFF, #E42291); color: #FFFFFF;">
+                  <i class="fa-brands fa-facebook-messenger"></i>
+                </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-medium text-white mb-1">Messenger</h3>
+                <p class="text-xs text-[#A3A3A3] leading-relaxed">透過 Messenger 聯絡。</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 2: GUESTBOOK -->
+        <div id="view-guestbook" class="tab-content hidden space-y-6">
+          <div class="bg-[#111111]/80 backdrop-blur-md card-border rounded-2xl p-6 shadow-xl">
+            <h2 class="text-lg font-semibold text-white mb-4">訪客留言板</h2>
+            <form id="guestbook-form" class="space-y-4" onsubmit="handleGuestbookSubmit(event)">
+              <div>
+                <label for="gb-name" class="block text-xs font-medium text-[#A3A3A3] mb-1">姓名</label>
+                <input type="text" id="gb-name" required placeholder="請輸入您的姓名" maxlength="30" class="w-full bg-[#0A0A0A]/90 card-border rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label for="gb-message" class="block text-xs font-medium text-[#A3A3A3]">留言內容</label>
+                  <span id="gb-char-count" class="text-xs text-[#A3A3A3]">0 / 150</span>
+                </div>
+                <textarea id="gb-message" required placeholder="請留下給我的訊息..." rows="3" maxlength="150" oninput="updateCharCount(this)" class="w-full bg-[#0A0A0A]/90 card-border rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none"></textarea>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="bg-white hover:bg-zinc-200 text-black font-medium px-5 py-2.5 rounded-xl text-sm transition shadow-md">
+                  送出留言
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-[#111111]/80 backdrop-blur-md card-border rounded-2xl p-6 shadow-xl">
+            <h3 class="text-sm font-semibold text-white mb-4">最新留言</h3>
+            <div id="guestbook-list" class="space-y-3">
+              <!-- Guestbook List -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ABOUT ME -->
+        <div id="view-about" class="tab-content hidden space-y-6">
+          <div class="bg-[#111111]/80 backdrop-blur-md card-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <div>
+              <h2 class="text-xl font-semibold text-white mb-3">個人簡介 & 設計理念</h2>
+              <p class="text-sm text-[#E5E5E5] leading-relaxed">
+                你好！我是 Neil Lin（林祐頡），來自台中。<br><br>
+                這是我專屬的個人品牌入口網站。我專注於數位產品開發、視覺傳達與品牌體驗設計。我相信極簡主義不僅是一種視覺選擇，更是一種追求明確、效率與高質感的態度。
+              </p>
+            </div>
+
+            <hr class="border-t card-border">
+
+            <div>
+              <h2 class="text-xl font-semibold text-white mb-3">關於個人識別</h2>
+              <p class="text-sm text-[#E5E5E5] leading-relaxed">
+                個人品牌設計以俐落的極簡風格為主軸，搭配現代金屬線條與深色基調，展現專注、精準與不斷向上的創作能量。
+              </p>
+            </div>
+
+            <hr class="border-t card-border">
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div class="bg-[#0A0A0A]/90 card-border p-4 rounded-xl">
+                <p class="text-xs text-[#A3A3A3] mb-1">設計風格</p>
+                <p class="text-sm font-medium text-white">極簡 / 現代 / 個人品牌</p>
+              </div>
+              <div class="bg-[#0A0A0A]/90 card-border p-4 rounded-xl">
+                <p class="text-xs text-[#A3A3A3] mb-1">專業領域</p>
+                <p class="text-sm font-medium text-white">UI/UX 設計 / 品牌識別</p>
+              </div>
+              <div class="bg-[#0A0A0A]/90 card-border p-4 rounded-xl">
+                <p class="text-xs text-[#A3A3A3] mb-1">合作方式</p>
+                <p class="text-sm font-medium text-white">Email / 社群媒體</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= Footer Area ================= -->
+  <footer class="w-full border-t card-border py-6 mt-auto relative z-10 bg-[rgba(5,5,5,0.75)] backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-[#A3A3A3]">
+      <p>© 2026 Neil Lin Studio. 版權所有。</p>
+    </div>
+  </footer>
+
+  <!-- ================= LINE Modal ================= -->
+  <div id="line-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+    <div class="bg-[#111111] card-border-strong rounded-2xl max-w-sm w-full p-6 space-y-5 text-center relative shadow-2xl">
+      <h3 class="text-lg font-semibold text-white">加入 LINE 好友</h3>
+      
+      <div class="w-48 h-48 mx-auto bg-black rounded-xl p-2 flex items-center justify-center card-border overflow-hidden">
+        <img id="modal-line-qr" src="" alt="LINE QR Code" class="w-full h-full object-contain">
+      </div>
+
+      <div class="bg-[#0A0A0A] card-border px-4 py-2.5 rounded-xl flex items-center justify-between">
+        <span class="text-xs text-[#A3A3A3]">LINE ID:</span>
+        <span id="modal-line-id" class="text-sm font-mono text-white font-medium">suguru_uj</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 pt-2">
+        <button onclick="copyLineId()" class="w-full bg-white text-black font-medium py-2.5 rounded-xl text-sm hover:bg-zinc-200 transition">
+          複製 ID
+        </button>
+        <button onclick="closeLineModal()" class="w-full bg-zinc-800 text-white font-medium py-2.5 rounded-xl text-sm hover:bg-zinc-700 card-border transition">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-white text-black text-xs font-medium px-4 py-3 rounded-xl shadow-xl opacity-0 pointer-events-none z-50 flex items-center space-x-2">
+    <i class="fa-solid fa-circle-check text-green-600"></i>
+    <span id="toast-message">已複製</span>
+  </div>
+
+  <script>
+    const STUDENT_CONFIG = {
+      name: "Neil Lin",
+      chineseName: "林祐頡",
+      brand: "Neil Lin Studio",
+      location: "台中市，台灣",
+      email: "",
+      
+      logo: "avatar.jpg",
+      backgroundVideo: "bg.mp4",
+      
+      website: "https://example.com",
+      instagram: "https://instagram.com/suguru_uj",
+      instagramUsername: "@suguru_uj",
+      facebook: "https://facebook.com/林祐頡",
+      facebookUsername: "林祐頡",
+      threads: "https://threads.net/@suguru_uj",
+      threadsUsername: "@suguru_uj",
+      whatsapp: "https://wa.me/886912345678",
+      messenger: "https://m.me/suguru_uj",
+      facetime: "facetime-audio:neil.lin@example.com",
+      lineId: "suguru_uj",
+      lineQrCode: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23000000'/><rect x='20' y='20' width='160' height='160' fill='%2306C755' rx='16'/><rect x='35' y='35' width='130' height='130' fill='%23FFFFFF' rx='12'/><rect x='50' y='50' width='35' height='35' fill='%23000000'/><rect x='55' y='55' width='25' height='25' fill='%23FFFFFF'/><rect x='62' y='62' width='11' height='11' fill='%23000000'/><rect x='115' y='50' width='35' height='35' fill='%23000000'/><rect x='120' y='55' width='25' height='25' fill='%23FFFFFF'/><rect x='127' y='62' width='11' height='11' fill='%23000000'/><rect x='50' y='115' width='35' height='35' fill='%23000000'/><rect x='55' y='120' width='25' height='25' fill='%23FFFFFF'/><rect x='62' y='127' width='11' height='11' fill='%23000000'/><rect x='100' y='100' width='15' height='15' fill='%23000000'/><rect x='130' y='115' width='20' height='20' fill='%23000000'/><rect x='100' y='135' width='20' height='15' fill='%23000000'/><rect x='125' y='140' width='25' height='25' fill='%23000000'/></svg>",
+      bio: "你好！我是 Neil Lin（林祐頡），來自台灣台中。專注於數位體驗設計、視覺傳達與個人品牌打造，致力於將簡約美學與實用功能完美融合。",
+      quote: "「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」",
+      quoteAuthor: "— 尼采 (Nietzsche)"
+    };
+
+    const STORAGE_KEY_GUESTBOOK = "student_portal_guestbook";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      try { renderStudentProfile(); } catch (e) { console.error(e); }
+      try { renderGuestbook(); } catch (e) { console.error(e); }
+      try { initCatCursor(); } catch (e) { console.error(e); }
+    });
+
+    /* 🐱 可愛貓咪動態鼠標邏輯 */
+    function initCatCursor() {
+      // 僅在桌面滑鼠裝置上開啓
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+
+      const head = document.getElementById("cat-head");
+      const ring = document.getElementById("cat-ring");
+      if (!head || !ring) return;
+
+      // 成功找到元件，才給 body 加上 class 隱藏原生滑鼠
+      document.body.classList.add("has-custom-cursor");
+
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let ringX = mouseX;
+      let ringY = mouseY;
+      let lastTrailTime = 0;
+
+      window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        head.style.left = `${mouseX}px`;
+        head.style.top = `${mouseY}px`;
+
+        const now = Date.now();
+        if (now - lastTrailTime > 120) {
+          createPawTrail(mouseX, mouseY);
+          lastTrailTime = now;
+        }
+      });
+
+      function createPawTrail(x, y) {
+        const paw = document.createElement("div");
+        paw.className = "cat-paw-trail";
+        paw.innerHTML = "🐾";
+        paw.style.left = `${x}px`;
+        paw.style.top = `${y + 15}px`;
+        document.body.appendChild(paw);
+
+        setTimeout(() => paw.remove(), 800);
+      }
+
+      function animateRing() {
+        ringX += (mouseX - ringX) * 0.18;
+        ringY += (mouseY - ringY) * 0.18;
+
+        ring.style.left = `${ringX}px`;
+        ring.style.top = `${ringY}px`;
+
+        requestAnimationFrame(animateRing);
+      }
+      animateRing();
+
+      window.addEventListener("mousedown", () => document.body.classList.add("cursor-active"));
+      window.addEventListener("mouseup", () => document.body.classList.remove("cursor-active"));
+
+      const bindHoverEvents = () => {
+        const hoverTargets = document.querySelectorAll("a, button, input, textarea, .card-border, [onclick]");
+        hoverTargets.forEach((el) => {
+          el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
+          el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
+        });
+      };
+
+      bindHoverEvents();
+
+      const observer = new MutationObserver(bindHoverEvents);
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    function renderStudentProfile() {
+      const brandElem = document.getElementById("header-brand");
+      if (brandElem) brandElem.textContent = STUDENT_CONFIG.brand;
+      
+      const headerLogo = document.getElementById("header-logo");
+      if (headerLogo) headerLogo.src = STUDENT_CONFIG.logo;
+
+      const profileImage = document.getElementById("profile-image");
+      if (profileImage) profileImage.src = STUDENT_CONFIG.logo;
+
+      if (STUDENT_CONFIG.backgroundVideo) {
+        const bgVid = document.getElementById("bg-video");
+        if (bgVid) {
+          const source = bgVid.querySelector("source");
+          if (source) source.src = STUDENT_CONFIG.backgroundVideo;
+          bgVid.load();
+        }
+      }
+
+      const nameElem = document.getElementById("profile-name");
+      if (nameElem) nameElem.textContent = STUDENT_CONFIG.name;
+
+      const cNameElem = document.getElementById("profile-chinese-name");
+      if (cNameElem) cNameElem.textContent = STUDENT_CONFIG.chineseName;
+
+      const pBrandElem = document.getElementById("profile-brand");
+      if (pBrandElem) pBrandElem.textContent = STUDENT_CONFIG.brand;
+
+      const locElem = document.getElementById("profile-location");
+      if (locElem) locElem.textContent = STUDENT_CONFIG.location;
+      
+      const emailElem = document.getElementById("profile-email");
+      const emailLabel = document.getElementById("profile-email-label");
+      
+      if (STUDENT_CONFIG.email && STUDENT_CONFIG.email.trim() !== "") {
+        if (emailElem) {
+          emailElem.textContent = STUDENT_CONFIG.email;
+          emailElem.href = `mailto:${STUDENT_CONFIG.email}`;
+          emailElem.classList.remove("hidden");
+        }
+        if (emailLabel) emailLabel.classList.add("hidden");
+      } else {
+        if (emailElem) emailElem.classList.add("hidden");
+        if (emailLabel) emailLabel.classList.remove("hidden");
+      }
+      
+      const bioElem = document.getElementById("profile-bio");
+      if (bioElem) bioElem.textContent = STUDENT_CONFIG.bio;
+
+      const quoteText = document.getElementById("quote-text");
+      if (quoteText) quoteText.textContent = STUDENT_CONFIG.quote;
+
+      const quoteAuthor = document.getElementById("profile-quote-author");
+      if (quoteAuthor) quoteAuthor.textContent = STUDENT_CONFIG.quoteAuthor;
+
+      const lineIdElem = document.getElementById("modal-line-id");
+      if (lineIdElem) lineIdElem.textContent = STUDENT_CONFIG.lineId;
+
+      const lineQrElem = document.getElementById("modal-line-qr");
+      if (lineQrElem) lineQrElem.src = STUDENT_CONFIG.lineQrCode;
+    }
+
+    function switchTab(tabKey) {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active", "text-white");
+        btn.classList.add("text-[#A3A3A3]");
+      });
+      
+      const activeBtn = document.getElementById(`tab-${tabKey}`);
+      if (activeBtn) {
+        activeBtn.classList.add("active", "text-white");
+        activeBtn.classList.remove("text-[#A3A3A3]");
+      }
+
+      document.querySelectorAll(".tab-content").forEach(view => {
+        view.classList.add("hidden");
+      });
+      
+      const targetView = document.getElementById(`view-${tabKey}`);
+      if (targetView) targetView.classList.remove("hidden");
+    }
+
+    function openLineModal() {
+      const modal = document.getElementById("line-modal");
+      if (modal) modal.classList.remove("hidden");
+    }
+
+    function closeLineModal() {
+      const modal = document.getElementById("line-modal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function copyLineId() {
+      const lineId = STUDENT_CONFIG.lineId;
+      const tempInput = document.createElement("input");
+      tempInput.value = lineId;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      
+      try {
+        document.execCommand("copy");
+        showToast("已複製");
+      } catch (err) {
+        showToast("複製失敗");
+      }
+      
+      document.body.removeChild(tempInput);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const msgElem = document.getElementById("toast-message");
+      if (msgElem) msgElem.textContent = message;
+      if (toast) {
+        toast.classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          toast.classList.add("opacity-0", "pointer-events-none");
+        }, 2000);
+      }
+    }
+
+    function updateCharCount(textarea) {
+      const count = textarea.value.length;
+      const counter = document.getElementById("gb-char-count");
+      if (counter) counter.textContent = `${count} / 150`;
+    }
+
+    function getGuestbookData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY_GUESTBOOK);
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveGuestbookData(data) {
+      try {
+        localStorage.setItem(STORAGE_KEY_GUESTBOOK, JSON.stringify(data));
+      } catch (e) {
+        console.error("LocalStorage 不可用", e);
+      }
+    }
+
+    function handleGuestbookSubmit(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById("gb-name");
+      const messageInput = document.getElementById("gb-message");
+
+      if (!nameInput || !messageInput) return;
+
+      const newEntry = {
+        id: Date.now(),
+        name: nameInput.value.trim(),
+        message: messageInput.value.trim(),
+        date: new Date().toLocaleDateString("zh-TW", { year: 'numeric', month: '2-digit', day: '2-digit' })
+      };
+
+      const entries = getGuestbookData();
+      entries.unshift(newEntry);
+      saveGuestbookData(entries);
+
+      nameInput.value = "";
+      messageInput.value = "";
+      updateCharCount(messageInput);
+
+      renderGuestbook();
+      showToast("留言已送出");
+    }
+
+    function deleteGuestbookEntry(id) {
+      let entries = getGuestbookData();
+      entries = entries.filter(item => item.id !== id);
+      saveGuestbookData(entries);
+      renderGuestbook();
+      showToast("留言已刪除");
+    }
+
+    function renderGuestbook() {
+      const listContainer = document.getElementById("guestbook-list");
+      if (!listContainer) return;
+
+      const entries = getGuestbookData();
+
+      if (entries.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-8 text-[#A3A3A3] text-sm">
+            目前還沒有留言。
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = entries.map(item => `
+        <div class="bg-[#0A0A0A]/90 card-border p-4 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-sm text-white">${escapeHtml(item.name)}</span>
+            <div class="flex items-center space-x-3">
+              <span class="text-xs text-[#A3A3A3]">${item.date}</span>
+              <button onclick="deleteGuestbookEntry(${item.id})" class="text-xs text-zinc-400 hover:text-red-400 transition">
+                刪除
+              </button>
+            </div>
+          </div>
+          <p class="text-sm text-[#E5E5E5] leading-relaxed break-words">${escapeHtml(item.message)}</p>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+  </script>
+</body>
+</html>
